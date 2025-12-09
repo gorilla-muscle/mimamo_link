@@ -1,63 +1,93 @@
 import 'package:flutter/material.dart';
+import 'screens/onboarding/onboarding_flow.dart';
+import 'constants/colors.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const MimamoLinkApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MimamoLinkApp extends StatelessWidget {
+  const MimamoLinkApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'みまもりんく',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        primaryColor: AppColors.primary,
+        scaffoldBackgroundColor: Colors.white,
+        fontFamily: 'Zen Maru Gotnic',
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: AppColors.primary,
+          primary: AppColors.primary
+        )
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-      routes: {
-      }
+      home: const AppNavigator()
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-  final String title;
+class AppNavigator extends StatefulWidget {
+  const AppNavigator({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<AppNavigator> createState() => _AppNavigatorState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  late PageController _pageController;
-  int _selectedIndex = 0;
+class _AppNavigatorState extends State<AppNavigator> {
+  String _currentScreen = 'onboarding';
 
-  @override
-  void initState() {
-    super.initState();
-    _pageController = PageController(initialPage: _selectedIndex);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _pageController.dispose();
-  }
-
-  void _onPageChanged(int index) {
+  void _navigateTo(String screen) {
     setState(() {
-      _selectedIndex = index;
+      _currentScreen = screen;
     });
   }
 
+  void _handleOnboardingComplete() {
+    setState(() {
+      _currentScreen = 'signin';
+    });
+  }
+
+  Widget _renderScreen() {
+    switch (_currentScreen) {
+      case 'onboarding':
+        return OnboardingFlow(
+          onComplete: _handleOnboardingComplete,
+          onNavigate: _navigateTo
+        );
+    }
+    return const SizedBox.shrink();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: PageView(
-        controller: _pageController,
-        onPageChanged: _onPageChanged,
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFFFFF5E6), Color(0xFFFFE0B2)]
+        )
+      ),
+      child: SafeArea(
+        child: Center(
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 448),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(color: Colors.black12, blurRadius: 10, spreadRadius: 5)
+              ]
+            ),
+            child: Scaffold(
+              backgroundColor: Colors.transparent,
+              body: _renderScreen(),
+              bottomNavigationBar: null
+            )
+          )
+        )
       )
     );
   }
